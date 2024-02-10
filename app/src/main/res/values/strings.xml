@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TripSearcher</string>
+
+
+    <string name="home_menu">Home</string>
+    <string name="location_menu">Locations</string>
+    <string name="create_menu">Create One</string>
+
+    <string name="txt_info_title">Find your next trip</string>
+
+    <string name="txt_info_hello">Hello User</string>
+
+</resources>
