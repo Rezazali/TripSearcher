@@ -3,6 +3,8 @@ package com.zali.tripsearcher.presentation.home.homelist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.zali.tripsearcher.R
 import com.zali.tripsearcher.domain.Type
@@ -55,8 +57,14 @@ class HomeAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
 class SlideViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
+    val imageSlider = itemView.findViewById<AppCompatImageView>(R.id.img_rectangle)
+    var textTitle = itemView.findViewById<AppCompatTextView>(R.id.txt_title)
+    val textPrice = itemView.findViewById<AppCompatTextView>(R.id.txt_price)
+    val textRate = itemView.findViewById<AppCompatTextView>(R.id.txt_rate)
     override fun bind(item: ContentMain) {
-
+        textTitle.text = item.data[adapterPosition].title
+        textPrice.text = item.data[adapterPosition].title
+        textRate.text = item.data[adapterPosition].title
     }
 }
 
