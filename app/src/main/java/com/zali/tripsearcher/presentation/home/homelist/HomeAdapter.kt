@@ -13,7 +13,8 @@ import com.zali.tripsearcher.domain.DataItem
 
 import com.zali.tripsearcher.domain.model.Item
 
-class HomeAdapter(private val dataItemList: List<DataItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HomeAdapter(private val dataItemList: List<DataItem>, private var bannerIntractor: BannerIntractor) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType) {
             R.layout.item_recycler_banner -> {
@@ -34,8 +35,11 @@ class HomeAdapter(private val dataItemList: List<DataItem>) : RecyclerView.Adapt
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = dataItemList[position]
         when (holder) {
-            is BannerItemViewHolder -> if (item.viewType == DataItemType.BANNER) { // Assuming DataItem.BannerDataItem exists and holds a List<Item>
-                holder.bindBannerView(item.recyclerItemList) // Assuming bannerItems is the List<Item> you want to pass
+            is BannerItemViewHolder -> if (item.viewType == DataItemType.BANNER) {
+                holder.itemView.setOnClickListener {
+                    item.recyclerItemList?.get(0)?.let { it1 -> bannerIntractor.onBannerClicked(it1.id) }
+                }
+                holder.bindBannerView(item.recyclerItemList)
             }
             is RecyclerItemViewHolder -> {
                 when(item.viewType){

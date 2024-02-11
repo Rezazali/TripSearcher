@@ -13,6 +13,7 @@ class ChildAdapter(private val viewType: Int, private val recyclerItemList: List
     RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when(viewType){
             DataItemType.SLIDER ->{
