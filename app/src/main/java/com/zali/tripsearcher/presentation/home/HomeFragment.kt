@@ -9,8 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import com.zali.tripsearcher.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.zali.tripsearcher.DataItemType
 import com.zali.tripsearcher.databinding.FragmentHomeBinding
+import com.zali.tripsearcher.domain.DataItem
+import com.zali.tripsearcher.presentation.home.homelist.HomeAdapter
 
 
 class HomeFragment : Fragment() {
@@ -23,7 +26,9 @@ class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
 
+    private lateinit var homeAdapter : HomeAdapter
 
+    private var listItem  = ArrayList<DataItem>()
     override fun onAttach(context: Context) {
         super.onAttach(context)
         owner = this
@@ -44,7 +49,26 @@ class HomeFragment : Fragment() {
 
         homeViewModel.requestListMain()
             .observe(owner){t->
-                var test = t
+                val test = t
+
+                for (i  in 0 until test.data.size){
+                    when (test.data[i].type) {
+                        "slide" -> {
+                            listItem.add(DataItem(DataItemType.SLIDER,test.data[i].items))
+                        }
+                        "story" -> {
+                            listItem.add(DataItem(DataItemType.STORY,test.data[i].items))
+                        }
+                        "banner" -> {
+                            listItem.add(DataItem(DataItemType.BANNER,test.data[i].items))
+                        }
+                    }
+                }
+
+                homeAdapter = HomeAdapter(listItem)
+
+                binding.recyclerMain.adapter = homeAdapter
+                binding.recyclerMain.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
                 Log.d(TAG, "onCreateView: ")
             }
 
@@ -54,4 +78,6 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
+
+
 }

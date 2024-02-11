@@ -1,83 +1,92 @@
 package com.zali.tripsearcher.presentation.home.homelist
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.zali.tripsearcher.DataItemType
 import com.zali.tripsearcher.R
-import com.zali.tripsearcher.domain.Type
-import com.zali.tripsearcher.domain.model.ContentMain
+import com.zali.tripsearcher.databinding.EachItemBinding
+import com.zali.tripsearcher.databinding.ItemRecyclerBannerBinding
+import com.zali.tripsearcher.domain.DataItem
 
-class HomeAdapter : RecyclerView.Adapter<BaseViewHolder>() {
+import com.zali.tripsearcher.domain.model.Item
 
-    private var listMain : List<ContentMain> = emptyList()
-
-    private val items: List<ListItem> = emptyList()
-
-    override fun getItemViewType(position: Int): Int {
-        return items[position].getItemList()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return when(viewType){
-            Type.Slide.ordinal ->{
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_rectangle,parent,false)
-                return SlideViewHolder(view)
+class HomeAdapter(private val dataItemList: List<DataItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when(viewType) {
+            R.layout.item_recycler_banner -> {
+                val binding = ItemRecyclerBannerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                BannerItemViewHolder(binding)
             }
-            Type.Story.ordinal ->{
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_populare,parent,false)
-                return StoryViewHolder(view)
-            }
-            Type.Banner.ordinal ->{
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_banner,parent,false)
-                return BannerViewHolder(view)
-            }
-
             else -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_rectangle,parent,false)
-                SlideViewHolder(view)
+                val binding = EachItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                RecyclerItemViewHolder(binding)
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return if (listMain.isEmpty()){
-            0
-        }else{
-            listMain.size
+        return dataItemList.size
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = dataItemList[position]
+        when (holder) {
+            is BannerItemViewHolder -> if (item.viewType == DataItemType.BANNER) { // Assuming DataItem.BannerDataItem exists and holds a List<Item>
+                holder.bindBannerView(item.recyclerItemList) // Assuming bannerItems is the List<Item> you want to pass
+            }
+            is RecyclerItemViewHolder -> {
+                when(item.viewType){
+                    DataItemType.SLIDER ->{
+                        item.recyclerItemList?.let { holder.bindSliderRecyclerView(it) }
+                    }
+                    DataItemType.STORY ->{
+                        item.recyclerItemList?.let {
+                            holder.bindStoryRecycler(it)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        holder.bind(listMain[position])
+    override fun getItemViewType(position: Int): Int {
+        return when (dataItemList[position].viewType) {
+            DataItemType.BANNER ->
+                R.layout.item_recycler_banner
+            else ->
+                R.layout.each_item
+        }
+    }
+}
+class RecyclerItemViewHolder(private val binding: EachItemBinding) :
+        RecyclerView.ViewHolder(binding.root){
+
+    init {
+        binding.childRecyclerView.layoutManager =
+            LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
+    }
+
+    fun bindSliderRecyclerView(itemList: List<Item>){
+        val adapter = ChildAdapter(DataItemType.SLIDER, itemList)
+        binding.childRecyclerView.adapter = adapter
+    }
+
+    fun bindStoryRecycler(itemList: List<Item>){
+        val adapter = ChildAdapter(DataItemType.STORY, itemList)
+        binding.childRecyclerView.adapter = adapter
     }
 }
 
-class SlideViewHolder(itemView: View) : BaseViewHolder(itemView) {
+class BannerItemViewHolder(private val binding: ItemRecyclerBannerBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
-    val imageSlider = itemView.findViewById<AppCompatImageView>(R.id.img_rectangle)
-    var textTitle = itemView.findViewById<AppCompatTextView>(R.id.txt_title)
-    val textPrice = itemView.findViewById<AppCompatTextView>(R.id.txt_price)
-    val textRate = itemView.findViewById<AppCompatTextView>(R.id.txt_rate)
-    override fun bind(item: ContentMain) {
-        textTitle.text = item.data[adapterPosition].title
-        textPrice.text = item.data[adapterPosition].title
-        textRate.text = item.data[adapterPosition].title
+    fun bindBannerView(banner: List<Item>?) {
+        Glide.with(binding.root.context)
+            .load(banner?.get(0)?.photo)
+            .into(binding.imgBanner)
     }
-}
 
-class StoryViewHolder(itemView: View) : BaseViewHolder(itemView) {
-
-    override fun bind(item: ContentMain) {
-
-    }
-}
-
-class BannerViewHolder(itemView: View) : BaseViewHolder(itemView) {
-
-    override fun bind(item: ContentMain) {
-
-    }
 }
